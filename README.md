@@ -1,66 +1,68 @@
-# Kazakhstan-Macroeconomic-Data-Pipeline-Data-Engineerg-Analytics-pet-project
+# Kazakhstan Macroeconomic Data Pipeline
 
-# 🇰🇿 Kazakhstan Macroeconomic Data Pipeline
+An end-to-end **ETL pipeline** that extracts currency exchange data (USD/KZT) from the National Bank of Kazakhstan API, transforms it with Python, loads into PostgreSQL, and visualizes in Power BI.
 
-An end-to-end **ETL Data Engineering project** built with **Apache Airflow (Docker Compose)**, **PostgreSQL**, and **Power BI**, using public data from the [National Bank of Kazakhstan API](https://data.nationalbank.kz/api-docs).
+## Architecture
 
----
-
-## Project Overview
-
-This project demonstrates a modern **Data Engineering workflow**:
-1. **Extract** currency exchange data (USD/KZT) from NBRK’s open API  
-2. **Transform** the data with Python & Pandas  
-3. **Load** it into a PostgreSQL warehouse  
-4. **Visualize** in Power BI dashboards  
-
----
+```
+┌──────────────┐     ┌─────────────────────────┐     ┌────────────┐     ┌───────────┐
+│  NBRK API    │────▶│   Apache Airflow DAG    │────▶│ PostgreSQL │────▶│ Power BI  │
+│ (USD/KZT)    │     │  Extract → Transform →  │     │ Warehouse  │     │ Dashboard │
+│              │     │  Load                    │     │            │     │           │
+└──────────────┘     └─────────────────────────┘     └────────────┘     └───────────┘
+                              │
+                              ▼
+                     ┌─────────────────┐
+                     │   CSV Data Lake  │
+                     │  raw/ processed/ │
+                     └─────────────────┘
+```
 
 ## Tech Stack
 
 | Layer | Technology |
-|-------|-------------|
-| **Orchestration** | Apache Airflow (Docker Compose) |
-| **Storage / Warehouse** | PostgreSQL |
-| **Processing** | Python (Pandas, SQLAlchemy) |
-| **Visualization** | Power BI |
-| **Infrastructure** | Docker Compose |
+|-------|-----------|
+| Orchestration | Apache Airflow (Docker Compose) |
+| Storage | PostgreSQL |
+| Processing | Python (Pandas, SQLAlchemy) |
+| Visualization | Power BI |
+| Infrastructure | Docker Compose |
 
----
+## Project Structure
 
-## Architecture
-1. NBRK API  →  Airflow DAG (Extract → Transform → Load)
-2. Data Lake (CSV files)
-3. PostgreSQL Database
-4. Power BI Dashboard
+```
+├── dags/
+│   └── nbrk_currency_pipeline.py   # Main ETL DAG
+├── data/
+│   ├── raw/                         # Raw extracted data
+│   └── processed/                   # Cleaned data
+├── docker-compose.yaml              # Airflow + PostgreSQL setup
+├── logs/                            # Airflow logs
+├── plugins/                         # Custom operators (optional)
+└── README.md
+```
 
----
+## Quick Start
 
-## Setup Instructions
+### Prerequisites
 
-### 1 Prerequisites
+- Docker & Docker Compose
+- Minimum 4 GB RAM for Docker
+- Ports `8080` (Airflow) and `5432` (PostgreSQL) available
 
-- Docker & Docker Compose installed  
-- Minimum 4 GB RAM allocated to Docker  
-- Port `8080` (Airflow) and `5432` (Postgres) available  
-
----
-
-### 2 Clone the Repository
+### Run
 
 ```bash
-git clone https://github.com/<your-username>/kazakhstan-macro-pipeline.git
-cd kazakhstan-macro-pipeline
+git clone https://github.com/assabayadilet/kz-macro-data-pipeline.git
+cd kz-macro-data-pipeline
+docker-compose up -d
+```
 
-### Project Structure
+Airflow UI: http://localhost:8080
 
-.
-├── dags/
-│   └── nbrk_currency_pipeline.py     # Main ETL DAG
-├── data/
-│   ├── raw/                          # Raw extracted data
-│   └── processed/                    # Cleaned data
-├── docker-compose.yaml               # Airflow + PostgreSQL setup
-├── logs/                             # Airflow logs
-├── plugins/                          # (Optional) custom operators/hooks
-└── README.md                         # This file
+## Pipeline Steps
+
+1. **Extract** — Fetch USD/KZT exchange rate data from [NBRK Open API](https://data.nationalbank.kz/api-docs)
+2. **Transform** — Clean and process data with Pandas
+3. **Load** — Insert into PostgreSQL via SQLAlchemy
+4. **Visualize** — Connect Power BI to PostgreSQL for dashboards
